@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -13,22 +13,29 @@ export class PostsController {
   }
 
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  async findAll() {
+    const result = this.postsService.findAll();
+    return result;
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+     const result = await this.postsService.findOne(id);
+     if(!result)throw new NotFoundException("Data Not Found")
+     return result
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+  async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+    const result = await this.postsService.findOne(id);
+    if(!result)throw new NotFoundException("Data Not Found")
     return this.postsService.update(id, updatePostDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
+    const result = await this.postsService.findOne(id);
+    if(!result)throw new NotFoundException("Data Not Found")
     return this.postsService.remove(id);
   }
 }
