@@ -1,9 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module,NestModule, MiddlewareConsumer} from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 
 @Module({
   imports: [
@@ -13,7 +12,11 @@ import { PostsModule } from './posts/posts.module';
     }),
     MongooseModule.forRoot(process.env.DB_URL),
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes('posts');
+  }
+}
