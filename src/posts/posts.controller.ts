@@ -1,14 +1,17 @@
+import { JoiValidationPipe } from './joi-validation.pipe';
 import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { createPostSchema } from './createPost.schema';
+import Joi from 'joi';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  create(@Body() createPostDto: CreatePostDto) {
+  create(@Body(new JoiValidationPipe(createPostSchema)) createPostDto: CreatePostDto) {
     return this.postsService.create(createPostDto);
   }
 
